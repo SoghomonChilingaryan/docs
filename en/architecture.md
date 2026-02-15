@@ -91,6 +91,19 @@ Feature isolation:
 - a feature must not import internals of another feature (especially `data/`, `bloc/`, `screens/`, `widgets/`)
 - if feature A needs something from feature B: move it to `common/*` or depend on a contract and wire via DI
 
+## UI / presentation rules (required)
+
+- `screens/` and `widgets/` are presentation only: build UI, react to state, and dispatch events.
+- Widgets must not contain business/data logic:
+  - no repository/file/SDK calls
+  - no data preparation loops to "make things work" (prefetching, caching, computing domain values)
+  - no orchestration that belongs to BLoC or repositories
+- Allowed in UI:
+  - navigation, `showDialog`/bottom sheets/snackbars
+  - UI-only state (controllers, animations)
+  - small view formatting (e.g. `Duration -> mm:ss`)
+- If a button/action needs more than trivial UI wiring: extract a dedicated widget and/or move orchestration into BLoC.
+
 ## External data access (strict)
 
 Any external data access must go through a repository interface in `domain`.
