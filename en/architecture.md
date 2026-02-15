@@ -152,6 +152,21 @@ Recommended registration layout:
 
 SDK integrations (Crashlytics/Sentry/Firebase/etc.) should be hidden behind DI and may live in `packages/*`.
 
+### Responsibility rule (required)
+
+- Only the class/module that performs the external call (sync or async) should log it.
+  - Usually this is the `data` layer: `RepositoryImpl` / `DataSource`.
+  - External systems: HTTP/API, storage/files/DB, platform services (permissions/device info), SDKs.
+- `BLoC` logs only what belongs to its responsibility:
+  - BLoC events/errors (via `AppBlocObserver`).
+  - Rarely: internal async orchestration that is not an external call.
+- Do not duplicate the same error logging in both BLoC and repository. External call failures are logged in repositories.
+
+Minimal standard for repositories:
+
+- wrap external calls with `try/catch`
+- in `catch (e, st)` call `logger.e(e, st, message: 'Class.method')`
+
 ## External integrations and big data (recommended)
 
 If the project has a large server API (many endpoints/DTOs) or big local storage (DB/cache/files/complex objects), recommend:
